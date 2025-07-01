@@ -1,7 +1,11 @@
 -- db/schema.sql
 
+-- Ensure you are using the correct database, or create it if it doesn't exist
+CREATE DATABASE IF NOT EXISTS it_management;
+USE it_management;
+
 -- 1. Department Table
-CREATE TABLE department (
+CREATE TABLE `department` (
     department_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -9,7 +13,7 @@ CREATE TABLE department (
 ) ENGINE=InnoDB;
 
 -- 2. Network Table
-CREATE TABLE network (
+CREATE TABLE `network` (
     network_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     subnet VARCHAR(50) NOT NULL,
@@ -19,7 +23,7 @@ CREATE TABLE network (
 ) ENGINE=InnoDB;
 
 -- 3. User Table
-CREATE TABLE user (
+CREATE TABLE `user` (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(150) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
@@ -30,13 +34,13 @@ CREATE TABLE user (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (department_id) REFERENCES department(department_id)
+    FOREIGN KEY (department_id) REFERENCES `department`(department_id)
         ON UPDATE CASCADE
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- 4. System Table
-CREATE TABLE system (
+CREATE TABLE `system` (
     system_id INT AUTO_INCREMENT PRIMARY KEY,
     hostname VARCHAR(100) NOT NULL UNIQUE,
     os_name VARCHAR(50) NOT NULL,
@@ -51,16 +55,16 @@ CREATE TABLE system (
     network_id INT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(user_id)
+    FOREIGN KEY (user_id) REFERENCES `user`(user_id)
         ON UPDATE CASCADE
         ON DELETE SET NULL,
-    FOREIGN KEY (network_id) REFERENCES network(network_id)
+    FOREIGN KEY (network_id) REFERENCES `network`(network_id)
         ON UPDATE CASCADE
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- 5. Peripheral Table
-CREATE TABLE peripheral (
+CREATE TABLE `peripheral` (
     peripheral_id INT AUTO_INCREMENT PRIMARY KEY,
     type ENUM('Printer', 'Router', 'Switch', 'UPS', 'Other') NOT NULL,
     model VARCHAR(100),
@@ -68,13 +72,13 @@ CREATE TABLE peripheral (
     assigned_to_system_id INT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (assigned_to_system_id) REFERENCES system(system_id)
+    FOREIGN KEY (assigned_to_system_id) REFERENCES `system`(system_id)
         ON UPDATE CASCADE
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- 6. Complaint Table
-CREATE TABLE complaint (
+CREATE TABLE `complaint` (
     complaint_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     subject VARCHAR(200) NOT NULL,
@@ -84,13 +88,13 @@ CREATE TABLE complaint (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     resolved_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES user(user_id)
+    FOREIGN KEY (user_id) REFERENCES `user`(user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- 7. Log Entry Table
-CREATE TABLE log_entry (
+CREATE TABLE `log_entry` (
     log_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     action VARCHAR(255) NOT NULL,
@@ -98,13 +102,13 @@ CREATE TABLE log_entry (
     resource_id INT,
     context TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(user_id)
+    FOREIGN KEY (user_id) REFERENCES `user`(user_id)
         ON UPDATE CASCADE
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- 8. Indexing for performance
-CREATE INDEX idx_user_email ON user (email);
-CREATE INDEX idx_system_user ON system (user_id);
-CREATE INDEX idx_complaint_status_priority ON complaint (status, priority);
-CREATE INDEX idx_log_action ON log_entry (action);
+CREATE INDEX idx_user_email ON `user` (email);
+CREATE INDEX idx_system_user ON `system` (user_id);
+CREATE INDEX idx_complaint_status_priority ON `complaint` (status, priority);
+CREATE INDEX idx_log_action ON `log_entry` (action);

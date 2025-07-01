@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Management Tool</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>IT Management</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-page="dashboard">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </li>
+                <li class="menu-item" data-page="systems">
+                    <span class="icon">💻</span>
+                    <span>Systems</span>
+                </li>
+                <li class="menu-item" data-page="peripherals">
+                    <span class="icon">🖨️</span>
+                    <span>Peripherals</span>
+                </li>
+                <li class="menu-item" data-page="complaints">
+                    <span class="icon">🛠️</span>
+                    <span>Complaints</span>
+                </li>
+                <li class="menu-item" data-page="logs">
+                    <span class="icon">📝</span>
+                    <span>Logs</span>
+                </li>
+                <li class="menu-item" data-page="reports">
+                    <span class="icon">📄</span>
+                    <span>Reports</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <span class="user-name">Not logged in</span>
+                    <span class="user-role"></span>
+                </div>
+                <button id="logoutBtn" class="btn-logout hidden">Logout</button>
+                <button id="loginBtn" class="btn-login">Login</button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="user-actions">
+                    <span id="currentUser"></span>
+                </div>
+            </header>
+
+            <!-- No login modal needed as we're using a separate login page -->
+
+            <!-- Content Pages -->
+            <div id="dashboard-page" class="content-page active">
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <h3>Systems</h3>
+                        <p class="count" id="systemCount">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>Peripherals</h3>
+                        <p class="count" id="peripheralCount">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>Open Complaints</h3>
+                        <p class="count" id="complaintCount">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>Departments</h3>
+                        <p class="count" id="departmentCount">0</p>
+                    </div>
+                </div>
+                <div class="dashboard-charts">
+                    <div class="chart-container">
+                        <h3>Complaints by Status</h3>
+                        <div class="chart" id="complaintStatusChart">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Systems by Department</h3>
+                        <div class="chart" id="systemDepartmentChart">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="systems-page" class="content-page">
+                <div class="page-actions">
+                    <button id="addSystemBtn" class="btn-primary">Add System</button>
+                    <div class="filter-container">
+                        <select id="departmentFilter">
+                            <option value="">All Departments</option>
+                        </select>
+                        <select id="networkFilter">
+                            <option value="">All Networks</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="systemsTable">
+                        <thead>
+                            <tr>
+                                <th>Hostname</th>
+                                <th>OS</th>
+                                <th>IP Address</th>
+                                <th>User</th>
+                                <th>Department</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Systems will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add/Edit System Modal -->
+                <div id="systemModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2 id="systemModalTitle">Add System</h2>
+                        <form id="systemForm">
+                            <input type="hidden" id="systemId">
+                            <div class="form-group">
+                                <label for="hostname">Hostname</label>
+                                <input type="text" id="hostname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="osName">OS Name</label>
+                                <input type="text" id="osName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="osVersion">OS Version</label>
+                                <input type="text" id="osVersion">
+                            </div>
+                            <div class="form-group">
+                                <label for="ramSize">RAM Size (GB)</label>
+                                <input type="number" id="ramSize" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cpuModel">CPU Model</label>
+                                <input type="text" id="cpuModel">
+                            </div>
+                            <div class="form-group">
+                                <label for="storageSize">Storage Size (GB)</label>
+                                <input type="number" id="storageSize" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label for="ipAddress">IP Address</label>
+                                <input type="text" id="ipAddress" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="macAddress">MAC Address</label>
+                                <input type="text" id="macAddress" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="antivirusStatus">Antivirus Status</label>
+                                <select id="antivirusStatus">
+                                    <option value="Installed">Installed</option>
+                                    <option value="Not Installed">Not Installed</option>
+                                    <option value="Unknown">Unknown</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="userName">Assigned User Name</label>
+                                <input type="text" id="userName" placeholder="Enter user's full name">
+                            </div>
+                            <div class="form-group">
+                                <label for="userEmail">User Email</label>
+                                <input type="email" id="userEmail" placeholder="Enter user's email">
+                            </div>
+                            <input type="hidden" id="userId" value="">
+                            <div class="form-group">
+                                <label for="networkId">Network</label>
+                                <select id="networkId" required>
+                                    <option value="">Select Network</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary">Save System</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="peripherals-page" class="content-page">
+                <div class="page-actions">
+                    <button id="addPeripheralBtn" class="btn-primary">Add Peripheral</button>
+                </div>
+                <div class="table-container">
+                    <table id="peripheralsTable">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Model</th>
+                                <th>Serial Number</th>
+                                <th>Assigned To</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Peripherals will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add/Edit Peripheral Modal -->
+                <div id="peripheralModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2 id="peripheralModalTitle">Add Peripheral</h2>
+                        <form id="peripheralForm">
+                            <input type="hidden" id="peripheralId">
+                            <div class="form-group">
+                                <label for="peripheralType">Type</label>
+                                <select id="peripheralType" required>
+                                    <option value="Printer">Printer</option>
+                                    <option value="Router">Router</option>
+                                    <option value="Switch">Switch</option>
+                                    <option value="UPS">UPS</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="peripheralModel">Model</label>
+                                <input type="text" id="peripheralModel">
+                            </div>
+                            <div class="form-group">
+                                <label for="serialNumber">Serial Number</label>
+                                <input type="text" id="serialNumber">
+                            </div>
+                            <div class="form-group">
+                                <label for="assignedSystem">Assigned To System</label>
+                                <select id="assignedSystem">
+                                    <option value="">None</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary">Save Peripheral</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="complaints-page" class="content-page">
+                <div class="page-actions">
+                    <button id="addComplaintBtn" class="btn-primary">Add Complaint</button>
+                    <div class="filter-container">
+                        <select id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                        <select id="priorityFilter">
+                            <option value="">All Priorities</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="complaintsTable">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Submitted By</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Complaints will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add/Edit Complaint Modal -->
+                <div id="complaintModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2 id="complaintModalTitle">Add Complaint</h2>
+                        <form id="complaintForm">
+                            <input type="hidden" id="complaintId">
+                            <div class="form-group">
+                                <label for="subject">Subject</label>
+                                <input type="text" id="subject" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea id="description" rows="4" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority</label>
+                                <select id="priority" required>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                            </div>
+                            <div class="form-group status-group hidden">
+                                <label for="status">Status</label>
+                                <select id="status">
+                                    <option value="Open">Open</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Resolved">Resolved</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary">Save Complaint</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="logs-page" class="content-page">
+                <div class="page-actions">
+                    <div class="filter-container">
+                        <select id="logActionFilter">
+                            <option value="">All Actions</option>
+                            <option value="System Added">System Added</option>
+                            <option value="System Updated">System Updated</option>
+                            <option value="System Deleted">System Deleted</option>
+                            <option value="Complaint Updated">Complaint Updated</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="logsTable">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Resource</th>
+                                <th>Date/Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Logs will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="reports-page" class="content-page">
+                <div class="reports-container">
+                    <div class="report-card">
+                        <h3>System Inventory Report</h3>
+                        <p>Export a complete list of all systems in the inventory.</p>
+                        <div class="report-filters">
+                            <select id="systemReportDepartment">
+                                <option value="">All Departments</option>
+                            </select>
+                            <select id="systemReportNetwork">
+                                <option value="">All Networks</option>
+                            </select>
+                        </div>
+                        <button id="exportSystemsBtn" class="btn-primary">Export PDF</button>
+                    </div>
+                    
+                    <div class="report-card">
+                        <h3>Complaints Report</h3>
+                        <p>Export a report of all complaints with their current status.</p>
+                        <div class="report-filters">
+                            <select id="complaintReportStatus">
+                                <option value="">All Statuses</option>
+                                <option value="Open">Open</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Resolved">Resolved</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                            <select id="complaintReportPriority">
+                                <option value="">All Priorities</option>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                        <button id="exportComplaintsBtn" class="btn-primary">Export PDF</button>
+                    </div>
+                    
+                    <div class="report-card">
+                        <h3>Peripherals Report</h3>
+                        <p>Export a list of all peripherals and their assignments.</p>
+                        <button id="exportPeripheralsBtn" class="btn-primary">Export PDF</button>
+                    </div>
+                    
+                    <div class="report-card">
+                        <h3>Activity Logs Report</h3>
+                        <p>Export a report of all system activity logs.</p>
+                        <button id="exportLogsBtn" class="btn-primary">Export PDF</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api-service.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/systems.js"></script>
+    <script src="js/peripherals.js"></script>
+    <script src="js/complaints.js"></script>
+    <script src="js/logs.js"></script>
+    <script src="js/reports.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
